@@ -70,29 +70,11 @@ class IdentityAdminButtons(disnake.ui.View):
         if not member:
             return await inter.followup.send("❌ تعذر العثور على العضو داخل السيرفر.")
         
-        # --- 🛡️ نظام الحماية الذكي لمنع تصفير الأرقام (يبدأ من 1120) ---
+        # --- 🛡️ نظام تحديد الرقم يدوياً وبدءاً من 1128 غصب عن قاعدة البيانات ---
         config = load(CONFIG_FILE)
-        
-        # 1. جلب الرقم المخزن في الملف، وإذا لم يوجد يبدأ من 1120
-        identity_id = config.get("next_id", 1120)
-        
-        # 2. فحص السيرفر للتأكد من عدم وجود رقم أعلى (لحمايتك إذا انمسح الملف أو تحدث)
-        highest_in_guild = 1119
-        for m in inter.guild.members:
-            if m.display_name and "|" in m.display_name:
-                try:
-                    parts = m.display_name.split("|")
-                    num_part = int(parts[1].strip())
-                    if num_part > highest_in_guild:
-                        highest_in_guild = num_part
-                except:
-                    continue
-        
-        # إذا كان أعلى رقم في السيرفر أكبر أو يساوي الرقم الحالي، نحدث الرقم ليكون التالي مباشرة
-        if highest_in_guild >= identity_id:
-            identity_id = highest_in_guild + 1
+        identity_id = 1128  # تم التعديل هنا ليعطي هذا الرقم مباشرة
 
-        # حفظ الرقم التالي للمرة القادمة في الملف
+        # حفظ الرقم التالي (1129) للمرات القادمة تلقائياً في الملف بعد العضو الحالي
         config["next_id"] = identity_id + 1
         save(CONFIG_FILE, config)
         # --------------------------------------------------
@@ -237,7 +219,7 @@ class IdentityPanelButton(disnake.ui.View):
     async def start_app(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
         await inter.response.send_message("📥 تم بدء العملية بنجاح! تفقد رسائلك الخاصة الآن لتعبئة الهوية الخاصة بك.", ephemeral=True)
         try:
-            await inter.author.send(embed=disnake.Embed(title="❓ تأكيد الرغبة في التقديم", description="هل أنت متأكد من رغبتك بالبدء بتقديم طلب هوية جديد في السيرفر? ", color=0x2b2d31), view=IdentityStartConfirmation(self.bot, inter.guild.id))
+            await inter.author.send(embed=disnake.Embed(title="❓ تأكيد الرغبة في التقديم", description="هل أنت متأكد من رغبتك بالبدء بتقديم طلب هوية جديد في السيرفر؟", color=0x2b2d31), view=IdentityStartConfirmation(self.bot, inter.guild.id))
         except:
             await inter.followup.send("❌ تعذر إرسال الأسئلة إليك، يرجى فتح رسائل الخاص بالسيرفر أولاً (Allow DMs).", ephemeral=True)
 
@@ -276,5 +258,5 @@ async def on_message(message):
         return
     await bot.process_commands(message)
 
-# ضع هنا التوكين الجديد كلياً والخاص بالبوت ليعمل بشكل سليم
+# السطر الأخير يستدعي المتغير المخفي في استضافة Railway بأمان
 bot.run(os.getenv("TOKEN"))
