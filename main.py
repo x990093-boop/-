@@ -237,7 +237,7 @@ class IdentityPanelButton(disnake.ui.View):
     async def start_app(self, button: disnake.ui.Button, inter: disnake.MessageInteraction):
         await inter.response.send_message("📥 تم بدء العملية بنجاح! تفقد رسائلك الخاصة الآن لتعبئة الهوية الخاصة بك.", ephemeral=True)
         try:
-            await inter.author.send(embed=disnake.Embed(title="❓ تأكيد الرغبة في التقديم", description="هل أنت متأكد من رغبتك بالبدء بتقديم طلب هوية جديد في السيرفر؟", color=0x2b2d31), view=IdentityStartConfirmation(self.bot, inter.guild.id))
+            await inter.author.send(embed=disnake.Embed(title="❓ تأكيد الرغبة في التقديم", description="هل أنت متأكد من رغبتك بالبدء بتقديم طلب هوية جديد في السيرفر? ", color=0x2b2d31), view=IdentityStartConfirmation(self.bot, inter.guild.id))
         except:
             await inter.followup.send("❌ تعذر إرسال الأسئلة إليك، يرجى فتح رسائل الخاص بالسيرفر أولاً (Allow DMs).", ephemeral=True)
 
@@ -276,5 +276,5 @@ async def on_message(message):
         return
     await bot.process_commands(message)
 
-# ضع التوكين الجديد النظيف هنا بين علامات التنصيص مباشرة وقوس واحد في النهاية
+# ضع هنا التوكين الجديد كلياً والخاص بالبوت ليعمل بشكل سليم
 bot.run("اكتب_هنا_التوكين_الخاص_ببوت_الهوية")
