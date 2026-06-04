@@ -272,8 +272,9 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.author.bot: return
+    if message.author.bot: 
+        return
     await bot.process_commands(message)
 
-# ضع هنا التوكين الخاص بالبوت الجديد ليعمل بشكل سليم
-bot.run("MTUxMTk0MjE0OTk1NDk5ODQzNA.G-vZ2s.RUCoTZ7vUTJAHOtF9mSh_qGHROBodHfHPqqYGE")
+# ضع التوكين الجديد النظيف هنا بين علامات التنصيص مباشرة وقوس واحد في النهاية
+bot.run("اكتب_هنا_التوكين_الخاص_ببوت_الهوية")
