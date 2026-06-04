@@ -277,4 +277,4 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # ضع هنا التوكين الجديد كلياً والخاص بالبوت ليعمل بشكل سليم
-bot.run("اكتب_هنا_التوكين_الخاص_ببوت_الهوية")
+bot.run(os.getenv("TOKEN"))
