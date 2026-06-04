@@ -276,4 +276,4 @@ async def on_message(message):
     await bot.process_commands(message)
 
 # ضع هنا التوكين الخاص بالبوت الجديد ليعمل بشكل سليم
-bot.run("ضع_التوكين_الجديد_هنا")
+bot.run("MTUxMTk0MjE0OTk1NDk5ODQzNA.G-vZ2s.RUCoTZ7vUTJAHOtF9mSh_qGHROBodHfHPqqYGE")
