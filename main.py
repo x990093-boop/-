@@ -17,20 +17,18 @@ CONFIG_FILE = "config.json"
 IDENTITY_SETUP_CHANNEL = 1484406368524828672   # روم بنل تقديم الهوية
 IDENTITY_ADMIN_CHANNEL = 1484405475805233202   # روم قبول ورفض الهوية للإدارة
 
-# ==== رتب التفعيل التلقائي ====
-AUTO_ROLES = [1491881927005835407, 1492523810937897132, 1491881746151510158]
+# ==== رتب التفعيل التلقائي الجديدة بعد التحديث ====
+AUTO_ROLES = [1513694524587642940, 1513696241018736761, 1513758074265931956]
 
 # النص الأصلي للحلف المعتمد في سيرفركم
 OATH_TEXT_ORIGINAL = "اقـسـم بـالله الـعـظـيـم انـا ( اسـمك ) انـي لـن اخـرب بـ رولات بـلاك لايـن و لـن اسـرب اي رابـط مـن روابـط الـسـيـرفـر وانـي لـن اهـكـر الـسـيـرفـر والله عـلـى مـا اقـولـه شـهـي\nد"
 
 
-# ================= 🛡️ دالة فحص رتب الإدارة وطاقم العمل (المصلحة بالكامل) =================
+# ================= 🛡️ دالة فحص رتب الإدارة وطاقم العمل =================
 def check_admin_permission(member):
-    # إذا كان يملك صلاحيات المسؤول العامة في السيرفر
     if member.guild_permissions.administrator or member.guild_permissions.manage_guild or member.guild_permissions.kick_members or member.guild_permissions.manage_roles:
         return True
     
-    # الفحص بالكلمات الدلالية لجميع الرتب لضمان عدم رفضهم عند ضغط الأزرار
     admin_keywords = ["اداره", "إدارة", "طاقم", "مسؤول", "مسئول", "اداري", "إداري", "امن", "أمن", "دعم", "شرف", "مراقب", "مشرف"]
     for role in member.roles:
         role_name_lower = role.name.lower()
@@ -70,20 +68,41 @@ class IdentityAdminButtons(disnake.ui.View):
         if not member:
             return await inter.followup.send("❌ تعذر العثور على العضو داخل السيرفر.")
         
-        # --- 🛡️ نظام تحديد الرقم يدوياً وبدءاً من 1128 غصب عن قاعدة البيانات ---
+        # --- 🛡️ نظام الحماية من التصفير الذكي عند التحديث (يبدأ من 1129) ---
         config = load(CONFIG_FILE)
-        identity_id = 1128  # تم التعديل هنا ليعطي هذا الرقم مباشرة
+        
+        # جلب الرقم المخزن وإذا كانت قاعدة البيانات فارغة يبدأ من 1129 تلقائياً
+        identity_id = config.get("next_id", 1129)
+        
+        # فحص السيرفر بشكل حي للتأكد من عدم تكرار الأرقام
+        highest_in_guild = 1128
+        for m in inter.guild.members:
+            if m.display_name and "|" in m.display_name:
+                try:
+                    parts = m.display_name.split("|")
+                    num_part = int(parts[1].strip())
+                    if num_part > highest_in_guild:
+                        highest_in_guild = num_part
+                except:
+                    continue
+        
+        if highest_in_guild >= identity_id:
+            identity_id = highest_in_guild + 1
 
-        # حفظ الرقم التالي (1129) للمرات القادمة تلقائياً في الملف بعد العضو الحالي
+        # حفظ الرقم التالي في الملف فوراً حتى لا يتصفر العداد عند ريستارت البوت
         config["next_id"] = identity_id + 1
         save(CONFIG_FILE, config)
         # --------------------------------------------------
         
+        # تغيير الاسم بالتنسيق المطلوب: Roblox Name | ID
         new_nick = f"{self.roblox_name} | {identity_id}"
         
-        try: await member.edit(nick=new_nick)
-        except Exception as e: print(f"⚠️ تعذر تغيير الاسم: {e}")
+        try: 
+            await member.edit(nick=new_nick)
+        except Exception as e: 
+            print(f"⚠️ تعذر تغيير الاسم: {e}")
 
+        # إعطاء الرتب الجديدة تلقائياً
         for role_id in AUTO_ROLES:
             role = inter.guild.get_role(role_id)
             if role:
@@ -148,7 +167,8 @@ class IdentityConfirmView(disnake.ui.View):
         embed.add_field(name="📝 حسابك روبلوكس:", value=self.answers["roblox"], inline=True)
         embed.add_field(name="📝 قانون السيرفر:", value=self.answers["rule1"], inline=False)
         embed.add_field(name="📝 قانون الرول:", value=self.answers["rule2"], inline=False)
-        embed.add_field(name="📜 الحلف المطلوب:", value=f"```\n{OATH_TEXT_ORIGINAL}\n```", inline=False)
+        embed.add_field(name="📜 الحلف المطلوب:", value=f"```\n{OATH_TEXT_ORIGINAL}\n
+```", inline=False)
         embed.add_field(name="✍️ كتابة العضو:", value=f"```\n{self.answers['oath']}\n```", inline=False)
         
         if self.answers["image_url"]:
@@ -258,5 +278,5 @@ async def on_message(message):
         return
     await bot.process_commands(message)
 
-# السطر الأخير يستدعي المتغير المخفي في استضافة Railway بأمان
+# تشغيل آمن يقرأ التوكن من Variables الاستضافة بدون تسريبه
 bot.run(os.getenv("TOKEN"))
