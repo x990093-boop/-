@@ -167,9 +167,11 @@ class IdentityConfirmView(disnake.ui.View):
         embed.add_field(name="📝 حسابك روبلوكس:", value=self.answers["roblox"], inline=True)
         embed.add_field(name="📝 قانون السيرفر:", value=self.answers["rule1"], inline=False)
         embed.add_field(name="📝 قانون الرول:", value=self.answers["rule2"], inline=False)
-        embed.add_field(name="📜 الحلف المطلوب:", value=f"```\n{OATH_TEXT_ORIGINAL}\n
-```", inline=False)
-        embed.add_field(name="✍️ كتابة العضو:", value=f"```\n{self.answers['oath']}\n```", inline=False)
+        embed.add_field(name="📜 الحلف المطلوب:", value=f"```\n{OATH_TEXT_ORIGINAL}\n```", inline=False)
+        
+        # تم إصلاح هذا السطر ليتجنب مشاكل f-string نهائياً وعلامات التنصيص
+        oath_text_user = self.answers['oath']
+        embed.add_field(name="✍️ كتابة العضو:", value=f"```\n{oath_text_user}\n```", inline=False)
         
         if self.answers["image_url"]:
             embed.set_image(url=self.answers["image_url"])
